@@ -75,17 +75,19 @@ const getRequest = (req, res, next) => {
                     if ((currentTime - parseInt(data[2])) > 1) {
                         client.set("countInSec"+username, 1)
                         client.set("startTimeSec", currentTime)
+                        res.render('index', { username: username, countSec: data[0], countMin: data[1], limitSec: data[4], limitMin: data[5] })
                     } 
                     
                     if ((currentTime - parseInt(data[3])) > 60) {
                         client.set("countInMin"+username, 1)
                         client.set("startTimeMin", currentTime)
+                        res.render('index', { username: username, countSec: data[0], countMin: data[1], limitSec: data[4], limitMin: data[5] })
                     } 
 
                     if ((currentTime - parseInt(data[2]) <= 1) && (currentTime - parseInt(data[3]) <= 60) ) {
-                        if(parseInt(data[0]) > parseInt(data[4])) {
+                        if(parseInt(data[0]) >= parseInt(data[4])) {
                             res.send('<h2>Too many requests in a second </h2>') 
-                        } else if  (parseInt(data[1]) > parseInt(data[5])) {
+                        } else if  (parseInt(data[1]) >= parseInt(data[5])) {
                             res.send('<h2>Too many requests in a minute </h2>') 
                         }  else {
                             client.incr("countInSec"+username)
@@ -118,10 +120,6 @@ const getRequest = (req, res, next) => {
 app.set('view engine', 'pug')
 
 app.get('/rate/:username', getRequest)
-
-// app.get('/authorized', function (req, res) {
-//     res.render('index', { user: "ngocduc" })
-// })
 
 app.listen(PORT, () => {
     console.log(`app listening at port ${PORT}`);
